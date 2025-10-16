@@ -1,0 +1,195 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 450,
+  "padding": { "left": 5, "right": 5, "top": 5, "bottom": 5 },
+  "autosize": { "type": "fit", "contains": "padding" },
+  "data": { "url": "parking_meters_enriched.csv" },
+  "transform": [
+    {"calculate": "toNumber(datum.installed_year)", "as": "year"},
+    {"calculate": "toNumber(datum.rate_per_hour)", "as": "rate"},
+    {"filter": "councilSel == 'All' || datum.city_council == councilSel"},
+    {"filter": "isValid(datum.year) && datum.year >= yearMin"}
+  ],
+  "params": [
+    {
+      "name": "councilSel",
+      "value": "All",
+      "bind": {
+        "input": "select",
+        "name": "City Council: ",
+        "options": ["All", "Victorian Government", "Brisbane City Council", "Moreton Bay Regional Council"]
+      }
+    },
+    {
+      "name": "yearMin",
+      "value": 2015,
+      "bind": { 
+        "input": "range", 
+        "name": "Min Install Year: ", 
+        "min": 2000, 
+        "max": 2025, 
+        "step": 1 
+      }
+    }
+  ],
+  "layer": [
+    {
+      "mark": { 
+        "type": "line", 
+        "interpolate": "monotone", 
+        "strokeWidth": 3, 
+        "color": "#0ea5e9",
+        "point": {
+          "filled": true,
+          "size": 80
+        }
+      },
+      "encoding": {
+        "x": { 
+          "field": "year", 
+          "type": "quantitative", 
+          "title": "Installed Year",
+          "scale": { "zero": false, "nice": true },
+          "axis": { 
+            "tickMinStep": 1,
+            "gridColor": "#e2e8f0",
+            "domainColor": "#cbd5e0",
+            "labelColor": "#475569",
+            "titleColor": "#1e293b",
+            "titleFontWeight": 600,
+            "titleFontSize": 14,
+            "labelFontSize": 12,
+            "titlePadding": 10
+          } 
+        },
+        "y": { 
+          "aggregate": "mean", 
+          "field": "rate", 
+          "type": "quantitative", 
+          "title": "Average Hourly Rate ($)",
+          "scale": { "zero": false, "nice": true },
+          "axis": {
+            "gridColor": "#e2e8f0",
+            "domainColor": "#cbd5e0",
+            "labelColor": "#475569",
+            "titleColor": "#1e293b",
+            "titleFontWeight": 600,
+            "titleFontSize": 14,
+            "labelFontSize": 12,
+            "titlePadding": 10
+          }
+        },
+        "tooltip": [
+          {"field": "year", "title": "Year"},
+          {"aggregate": "count", "field": "meter_id", "title": "Meters", "type": "quantitative", "format": ","},
+          {"aggregate": "mean", "field": "rate", "title": "Avg Rate ($/hr)", "type": "quantitative", "format": ".2f"}
+        ]
+      }
+    },
+    {
+      "transform": [
+        {"filter": "councilSel == 'All' || datum.city_council == councilSel"},
+        {"calculate": "toNumber(datum.installed_year)", "as": "y2"},
+        {"filter": "isValid(datum.y2) && datum.y2 >= yearMin"},
+        {"aggregate": [{"op": "median", "field": "y2", "as": "medYear"}]}
+      ],
+      "layer": [
+        {
+          "mark": { 
+            "type": "rule", 
+            "strokeDash": [8,4], 
+            "strokeWidth": 2, 
+            "color": "#8b5cf6", 
+            "opacity": 0.7 
+          },
+          "encoding": { 
+            "x": { "field": "medYear", "type": "quantitative" } 
+          }
+        },
+        {
+          "mark": { 
+            "type": "text", 
+            "align": "left", 
+            "dx": 8, 
+            "dy": -8, 
+            "fontWeight": 700, 
+            "fontSize": 12, 
+            "fill": "#8b5cf6" 
+          },
+          "encoding": { 
+            "x": { "field": "medYear", "type": "quantitative" }, 
+            "y": { "value": 0 }, 
+            "text": { "value": "Median install year" } 
+          }
+        }
+      ]
+    },
+    {
+      "data": { "url": "parking_meters_enriched.csv" },
+      "transform": [
+        {"filter": "councilSel == 'All'"},
+        {"filter": "councilSel == 'All' || datum.city_council == councilSel"},
+        {"calculate": "toNumber(datum.installed_year)", "as": "year"},
+        {"calculate": "toNumber(datum.rate_per_hour)", "as": "rate"},
+        {"filter": "isValid(datum.year) && datum.year >= yearMin && isValid(datum.rate)"},
+        {"aggregate": [{"op": "mean", "field": "rate", "as": "avgRate"}], "groupby": ["year"]},
+        {"joinaggregate": [{"op": "max", "field": "avgRate", "as": "maxRate"}]},
+        {"filter": "datum.avgRate >= datum.maxRate"},
+        {"window": [{"op": "row_number", "as": "rownum"}]},
+        {"filter": "datum.rownum == 1"}
+      ],
+      "layer": [
+        {
+          "mark": { 
+            "type": "point", 
+            "size": 200, 
+            "filled": false, 
+            "strokeWidth": 2.5, 
+            "color": "#f59e0b" 
+          },
+          "encoding": {
+            "x": { "field": "year", "type": "quantitative" },
+            "y": { "field": "avgRate", "type": "quantitative" }
+          }
+        },
+        {
+          "mark": { 
+            "type": "text", 
+            "align": "left", 
+            "dx": 8, 
+            "dy": -12, 
+            "fontWeight": 700, 
+            "fontSize": 11, 
+            "fill": "#f59e0b"
+          },
+          "encoding": {
+            "x": { "field": "year", "type": "quantitative" },
+            "y": { "field": "avgRate", "type": "quantitative" },
+            "text": { "value": "Peak rate" }
+          }
+        },
+        {
+          "mark": { 
+            "type": "text", 
+            "align": "left", 
+            "dx": 8, 
+            "dy": 2, 
+            "fontWeight": 600, 
+            "fontSize": 10, 
+            "fill": "#f59e0b"
+          },
+          "encoding": {
+            "x": { "field": "year", "type": "quantitative" },
+            "y": { "field": "avgRate", "type": "quantitative" },
+            "text": { "field": "avgRate", "type": "quantitative", "format": "$,.2f" }
+          }
+        }
+      ]
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter, sans-serif"
+  }
+}

@@ -1,0 +1,413 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 950,
+  "autosize": { "type": "fit", "contains": "padding" },
+  "projection": {
+    "type": "albers",
+    "parallels": [-18, -36],
+    "rotate": [-132, 0, 0],
+    "center": [0, -27]
+  },
+  "layer": [
+    {
+      "data": {
+        "graticule": {
+          "step": [10, 10],
+          "extent": [[110, -45], [155, -9]]
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#86888a",
+        "strokeOpacity": 0.9,
+        "strokeWidth": 0.7,
+        "filled": false
+      }
+    },
+    {
+      "data": {
+        "url": "aus-states.topo.json",
+        "format": {
+          "type": "topojson",
+          "feature": "STE_2021_AUST_GDA2020"
+        }
+      },
+      "mark": {
+        "type": "geoshape"
+      },
+      "encoding": {
+        "color": {"value": "#f7f9fb"},
+        "stroke": {"value": "#dfe6ee"},
+        "strokeWidth": {"value": 0.8}
+      }
+    },
+    {
+      "data": {
+        "url": "aus-states.topo.json",
+        "format": {
+          "type": "topojson",
+          "feature": "STE_2021_AUST_GDA2020"
+        }
+      },
+      "transform": [
+        {
+          "lookup": "properties.STE_NAME21",
+          "from": {
+            "data": {"url": "state_aggregates.csv"},
+            "key": "state_full",
+            "fields": ["meter_count", "avg_occupancy", "avg_rate", "population", "rate_per_100k"]
+          }
+        },
+        {
+          "calculate": "datum.rate_per_100k",
+          "as": "rate"
+        }
+      ],
+      "mark": {
+        "type": "geoshape"
+      },
+      "encoding": {
+        "color": {
+          "field": "rate",
+          "type": "quantitative",
+          "title": "Parking meters per 100k residents (2025)",
+          "scale": {
+            "scheme": "tealblues",
+            "domain": [0, 50]
+          }
+        }
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"abbr": "NSW", "lon": 147.0, "lat": -33.2},
+          {"abbr": "VIC", "lon": 144.4, "lat": -36.8},
+          {"abbr": "QLD", "lon": 146.0, "lat": -21.5},
+          {"abbr": "SA", "lon": 137.0, "lat": -30.8},
+          {"abbr": "WA", "lon": 122.5, "lat": -26.0},
+          {"abbr": "TAS", "lon": 146.8, "lat": -42.2},
+          {"abbr": "NT", "lon": 134.0, "lat": -19.8},
+          {"abbr": "ACT", "lon": 149.2, "lat": -35.5}
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "font": "'Segoe UI', Arial, Helvetica, sans-serif",
+        "fontSize": 15,
+        "fontWeight": 600,
+        "baseline": "middle",
+        "align": "center",
+        "fill": "#0f172a"
+      },
+      "encoding": {
+        "longitude": {"field": "lon"},
+        "latitude": {"field": "lat"},
+        "text": {"field": "abbr"}
+      }
+    },
+    {
+      "data": {
+        "url": "aus-states.topo.json",
+        "format": {
+          "type": "topojson",
+          "feature": "STE_2021_AUST_GDA2020"
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "filled": false,
+        "stroke": "#c6d3dd",
+        "strokeWidth": 1
+      }
+    },
+    {
+      "data": {
+        "url": "aus-states.topo.json",
+        "format": {
+          "type": "topojson",
+          "feature": "STE_2021_AUST_GDA2020"
+        }
+      },
+      "transform": [
+        {
+          "lookup": "properties.STE_NAME21",
+          "from": {
+            "data": {"url": "state_aggregates.csv"},
+            "key": "state_full",
+            "fields": ["meter_count", "avg_occupancy", "avg_rate", "population", "rate_per_100k"]
+          }
+        },
+        {
+          "calculate": "datum.rate_per_100k",
+          "as": "rate"
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "fillOpacity": 0,
+        "strokeOpacity": 0
+      },
+      "encoding": {
+        "tooltip": [
+          {"field": "properties.STE_NAME21", "title": "State/Territory"},
+          {"field": "meter_count", "title": "Parking Meters", "format": ","},
+          {"field": "population", "title": "Population", "format": ","},
+          {"field": "rate", "title": "Rate /100k", "format": ".2f"},
+          {"field": "avg_occupancy", "title": "Avg Occupancy %", "format": ".1f"},
+          {"field": "avg_rate", "title": "Avg Rate/Hour ($)", "format": ".2f"}
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"state": "Queensland", "annotation": "QLD leads per-capita", "subtext": "19.51 per 100k residents"}
+        ]
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "rule",
+            "strokeWidth": 3,
+            "stroke": "#0891b2",
+            "strokeDash": [8, 5]
+          },
+          "encoding": {
+            "x": {"value": 490},
+            "y": {"value": 220},
+            "x2": {"value": 610},
+            "y2": {"value": 140}
+          }
+        },
+        {
+          "mark": {
+            "type": "circle",
+            "size": 4000,
+            "fill": "#ffffff",
+            "stroke": "#0891b2",
+            "strokeWidth": 3,
+            "opacity": 0.98
+          },
+          "encoding": {
+            "x": {"value": 720},
+            "y": {"value": 100}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 18,
+            "fontWeight": 800,
+            "fill": "#0f172a"
+          },
+          "encoding": {
+            "x": {"value": 720},
+            "y": {"value": 93},
+            "text": {"field": "annotation"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 15,
+            "fontWeight": 700,
+            "fill": "#0891b2"
+          },
+          "encoding": {
+            "x": {"value": 720},
+            "y": {"value": 113},
+            "text": {"field": "subtext"}
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "values": [
+          {"state": "Victoria", "annotation": "VIC: Close second", "subtext": "18.14 per 100k residents"}
+        ]
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "rule",
+            "strokeWidth": 3,
+            "stroke": "#06b6d4",
+            "strokeDash": [8, 5]
+          },
+          "encoding": {
+            "x": {"value": 420},
+            "y": {"value": 480},
+            "x2": {"value": 540},
+            "y2": {"value": 600}
+          }
+        },
+        {
+          "mark": {
+            "type": "circle",
+            "size": 4000,
+            "fill": "#ffffff",
+            "stroke": "#06b6d4",
+            "strokeWidth": 3,
+            "opacity": 0.98
+          },
+          "encoding": {
+            "x": {"value": 650},
+            "y": {"value": 690}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 18,
+            "fontWeight": 800,
+            "fill": "#0f172a"
+          },
+          "encoding": {
+            "x": {"value": 650},
+            "y": {"value": 683},
+            "text": {"field": "annotation"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 15,
+            "fontWeight": 700,
+            "fill": "#06b6d4"
+          },
+          "encoding": {
+            "x": {"value": 650},
+            "y": {"value": 703},
+            "text": {"field": "subtext"}
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "values": [
+          {"annotation": "Per-capita analysis", "subtext": "reveals Queensland's", "subtext2": "infrastructure outpaces", "subtext3": "population growth"}
+        ]
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "rect",
+            "fill": "#e0f2fe",
+            "stroke": "#0284c7",
+            "strokeWidth": 3,
+            "cornerRadius": 12,
+            "opacity": 0.98
+          },
+          "encoding": {
+            "x": {"value": 20},
+            "y": {"value": 770},
+            "x2": {"value": 330},
+            "y2": {"value": 900}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 19,
+            "fontWeight": 900,
+            "fill": "#075985"
+          },
+          "encoding": {
+            "x": {"value": 175},
+            "y": {"value": 803},
+            "text": {"field": "annotation"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 16,
+            "fontWeight": 700,
+            "fill": "#0c4a6e"
+          },
+          "encoding": {
+            "x": {"value": 175},
+            "y": {"value": 828},
+            "text": {"field": "subtext"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 16,
+            "fontWeight": 700,
+            "fill": "#0c4a6e"
+          },
+          "encoding": {
+            "x": {"value": 175},
+            "y": {"value": 850},
+            "text": {"field": "subtext2"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "fontSize": 16,
+            "fontWeight": 700,
+            "fill": "#0c4a6e"
+          },
+          "encoding": {
+            "x": {"value": 175},
+            "y": {"value": 872},
+            "text": {"field": "subtext3"}
+          }
+        }
+      ]
+    }
+  ],
+  "title": {
+    "text": "Parking Meters per 100k Residents — Australia (2025)",
+    "anchor": "start",
+    "fontSize": 22,
+    "fontWeight": 700,
+    "color": "#0f172a",
+    "subtitle": "Normalized rate: (count ÷ population) × 100,000 (ABS 2023 estimates)",
+    "subtitleFontSize": 14,
+    "subtitleColor": "#475569",
+    "subtitleFontWeight": 500
+  },
+  "config": {
+    "view": {"stroke": null},
+    "font": "Helvetica, 'Segoe UI', Arial, sans-serif",
+    "title": {
+      "font": "Helvetica, 'Segoe UI', Arial, sans-serif",
+      "fontSize": 20,
+      "fontWeight": 600
+    },
+    "axis": {
+      "labelFont": "Helvetica, 'Segoe UI', Arial, sans-serif",
+      "titleFont": "Helvetica, 'Segoe UI', Arial, sans-serif",
+      "labelColor": "#0f172a",
+      "titleColor": "#0f172a"
+    },
+    "legend": {
+      "orient": "right",
+      "labelFontSize": 14,
+      "labelColor": "#0f172a",
+      "titleColor": "#0f172a",
+      "titleFontWeight": 700,
+      "titleFontSize": 15,
+      "gradientLength": 200,
+      "titleLimit": 300,
+      "labelLimit": 300,
+      "labelFontWeight": 600
+    }
+  }
+}

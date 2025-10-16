@@ -1,0 +1,116 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 400,
+  "autosize": { "type": "fit", "contains": "padding" },
+  "data": {
+    "url": "parking_meters_enriched.csv"
+  },
+  "transform": [
+    {
+      "aggregate": [
+        {
+          "op": "mean",
+          "field": "rate_per_hour",
+          "as": "avg_rate"
+        },
+        {
+          "op": "count",
+          "as": "count"
+        }
+      ],
+      "groupby": ["zone_type"]
+    },
+    {
+      "calculate": "datum.avg_rate",
+      "as": "rate_value"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "cornerRadiusEnd": 4
+      },
+      "encoding": {
+        "x": {
+          "field": "zone_type",
+          "type": "nominal",
+          "title": "Zone Type",
+          "sort": "-y",
+          "axis": {
+            "labelAngle": -45,
+            "labelFontSize": 11
+          }
+        },
+        "y": {
+          "field": "avg_rate",
+          "type": "quantitative",
+          "title": "Average Rate per Hour ($)",
+          "axis": {
+            "labelFontSize": 11
+          }
+        },
+        "color": {
+          "field": "zone_type",
+          "type": "nominal",
+          "scale": {
+            "scheme": "category10"
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "zone_type", "type": "nominal", "title": "Zone Type"},
+          {"field": "avg_rate", "type": "quantitative", "title": "Avg Rate ($)", "format": ".2f"},
+          {"field": "count", "type": "quantitative", "title": "Number of Meters"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -10,
+        "fontSize": 12,
+        "fontWeight": "bold"
+      },
+      "encoding": {
+        "x": {
+          "field": "zone_type",
+          "type": "nominal",
+          "sort": "-y"
+        },
+        "y": {
+          "field": "avg_rate",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "avg_rate",
+          "type": "quantitative",
+          "format": "$,.2f"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null },
+    "font": "Inter, sans-serif",
+    "axis": { 
+      "labelColor": "#475569", 
+      "titleColor": "#0f172a", 
+      "gridColor": "#e2e8f0", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600,
+      "domainColor": "#cbd5e0"
+    },
+    "legend": { 
+      "labelColor": "#0f172a", 
+      "titleColor": "#0f172a", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600
+    }
+  }
+}

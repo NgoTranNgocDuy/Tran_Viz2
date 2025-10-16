@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 460,
+  "autosize": { "type": "fit", "contains": "padding" },
+  "data": { "url": "parking_meters_enriched.csv" },
+  "transform": [
+    {"calculate": "toNumber(datum.distance_to_cbd_km)", "as": "dist"},
+    {"calculate": "toNumber(datum.rate_per_hour)", "as": "rate"},
+    {"calculate": "toNumber(datum.occupancy_pct)", "as": "occ"},
+    {"calculate": "toNumber(datum.bay_capacity_index)", "as": "cap"},
+    {"filter": "isValid(datum.dist) && isValid(datum.rate)"},
+    {"filter": "isValid(datum.occ) && datum.occ >= occMin"}
+  ],
+  "params": [
+    { "name": "maintSel", "select": { "type": "point", "fields": ["maintenance_status"] }, "bind": "legend" },
+    { "name": "occMin", "value": 50, "bind": { "input": "range", "name": " Min Occupancy (%): ", "min": 0, "max": 100, "step": 5 } }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "circle", "strokeWidth": 1.2, "stroke": "#ffffff", "opacity": 0.65 },
+      "encoding": {
+        "x": { "field": "dist", "type": "quantitative", "title": "Distance to CBD (km)",
+          "scale": { "zero": true, "nice": true, "padding": 10 },
+          "axis": { "grid": true, "tickCount": 8 }
+        },
+        "y": { "field": "rate", "type": "quantitative", "title": "Hourly Rate ($)",
+          "scale": { "zero": true, "nice": true, "padding": 10 },
+          "axis": { "grid": true, "tickCount": 6 }
+        },
+        "size": { "field": "cap", "type": "quantitative", "title": "Bay Capacity Index",
+          "scale": { "type": "pow", "exponent": 1.4, "range": [30, 900] },
+          "legend": { "orient": "bottom", "direction": "horizontal", "titleFontSize": 13, "labelFontSize": 11 }
+        },
+        "color": { "field": "maintenance_status", "type": "nominal", "title": "Maintenance Status",
+          "scale": { "range": ["#0072B2", "#E69F00", "#D55E00"] },
+          "legend": { "orient": "bottom", "titleFontSize": 13, "labelFontSize": 12, "symbolSize": 140 }
+        },
+        "opacity": { "condition": { "param": "maintSel", "value": 0.75 }, "value": 0.1 },
+        "tooltip": [
+          { "field": "meter_id", "title": "Meter" },
+          { "field": "city_council", "title": "Council" },
+          { "field": "rate", "title": "Rate ($/hr)", "type": "quantitative", "format": ".2f" },
+          { "field": "occ", "title": "Occupancy (%)", "type": "quantitative", "format": ".0f" },
+          { "field": "cap", "title": "Bay Capacity", "type": "quantitative", "format": "," },
+          { "field": "dist", "title": "Dist to CBD (km)", "type": "quantitative", "format": ".1f" }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null },
+    "font": "Inter, sans-serif",
+    "axis": { 
+      "labelColor": "#475569", 
+      "titleColor": "#0f172a", 
+      "gridColor": "#e2e8f0", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600,
+      "domainColor": "#cbd5e0"
+    },
+    "legend": { 
+      "labelColor": "#0f172a", 
+      "titleColor": "#0f172a", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600
+    }
+  }
+}

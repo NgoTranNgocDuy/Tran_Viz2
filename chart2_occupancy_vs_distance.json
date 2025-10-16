@@ -1,0 +1,109 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 420,
+  "autosize": { "type": "fit", "contains": "padding" },
+  
+  "data": {
+    "url": "parking_meters_enriched.csv"
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "opacity": 0.6,
+        "size": 60
+      },
+      "encoding": {
+        "x": {
+          "field": "distance_to_cbd_km",
+          "type": "quantitative",
+          "title": "Distance to CBD (km)",
+          "scale": {
+            "domain": [0, 10]
+          },
+          "axis": {
+            "labelFontSize": 11,
+            "grid": true
+          }
+        },
+        "y": {
+          "field": "occupancy_pct",
+          "type": "quantitative",
+          "title": "Occupancy Rate (%)",
+          "axis": {
+            "labelFontSize": 11,
+            "grid": true
+          }
+        },
+        "color": {
+          "field": "zone_type",
+          "type": "nominal",
+          "scale": {
+            "scheme": "tableau10"
+          },
+          "legend": {
+            "title": "Zone Type",
+            "titleFontSize": 12,
+            "labelFontSize": 11,
+            "orient": "right"
+          }
+        },
+        "tooltip": [
+          {"field": "meter_id", "type": "nominal", "title": "Meter ID"},
+          {"field": "suburb", "type": "nominal", "title": "Suburb"},
+          {"field": "distance_to_cbd_km", "type": "quantitative", "title": "Distance to CBD (km)", "format": ".2f"},
+          {"field": "occupancy_pct", "type": "quantitative", "title": "Occupancy %", "format": ".1f"},
+          {"field": "zone_type", "type": "nominal", "title": "Zone Type"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "color": "#d62728",
+        "strokeWidth": 3
+      },
+      "transform": [
+        {
+          "regression": "occupancy_pct",
+          "on": "distance_to_cbd_km",
+          "method": "linear"
+        }
+      ],
+      "encoding": {
+        "x": {
+          "field": "distance_to_cbd_km",
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "occupancy_pct",
+          "type": "quantitative"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null },
+    "font": "Inter, sans-serif",
+    "axis": { 
+      "labelColor": "#475569", 
+      "titleColor": "#0f172a", 
+      "gridColor": "#e2e8f0", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600,
+      "domainColor": "#cbd5e0"
+    },
+    "legend": { 
+      "labelColor": "#0f172a", 
+      "titleColor": "#0f172a", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600
+    }
+  }
+}

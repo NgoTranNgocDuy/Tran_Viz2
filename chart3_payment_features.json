@@ -1,0 +1,71 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 360,
+  "autosize": { "type": "fit", "contains": "padding" },
+  
+  "data": {
+    "url": "parking_meters_enriched.csv"
+  },
+  "transform": [
+    {
+      "fold": ["tap_to_pay", "coin_acceptor", "solar_powered"],
+      "as": ["feature", "value"]
+    },
+    {
+      "filter": "datum.value == 'TRUE'"
+    },
+    {
+      "aggregate": [
+        {
+          "op": "count",
+          "as": "count"
+        }
+      ],
+      "groupby": ["feature"]
+    },
+    {
+      "calculate": "datum.feature == 'tap_to_pay' ? 'Tap to Pay' : datum.feature == 'coin_acceptor' ? 'Coin Acceptor' : 'Solar Powered'",
+      "as": "feature_name"
+    }
+  ],
+  "mark": {
+    "type": "arc",
+    "innerRadius": 80,
+    "stroke": "#fff",
+    "strokeWidth": 2
+  },
+  "encoding": {
+    "theta": {
+      "field": "count",
+      "type": "quantitative",
+      "stack": true
+    },
+    "color": {
+      "field": "feature_name",
+      "type": "nominal",
+      "scale": {
+        "domain": ["Tap to Pay", "Coin Acceptor", "Solar Powered"],
+        "range": ["#0072B2", "#E69F00", "#009E73"]
+      },
+      "legend": {
+        "title": "Payment Feature",
+        "titleFontSize": 13,
+        "labelFontSize": 12,
+        "orient": "right"
+      }
+    },
+    "tooltip": [
+      {"field": "feature_name", "type": "nominal", "title": "Feature"},
+      {"field": "count", "type": "quantitative", "title": "Number of Meters"}
+    ]
+  },
+  "view": {
+    "stroke": null
+  },
+  "config": {
+    "font": "Inter, sans-serif",
+    "axis": { "labelColor": "#0f172a", "titleColor": "#0f172a", "gridColor": "#e2e8f0", "labelFontSize": 12, "titleFontSize": 13 },
+    "legend": { "labelColor": "#0f172a", "titleColor": "#0f172a", "labelFontSize": 12, "titleFontSize": 13 }
+  }
+}

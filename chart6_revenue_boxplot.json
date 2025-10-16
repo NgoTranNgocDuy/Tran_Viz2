@@ -1,0 +1,71 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 420,
+  "autosize": { "type": "fit", "contains": "padding" },
+  
+  "data": {
+    "url": "parking_meters_enriched.csv"
+  },
+  "mark": {
+    "type": "boxplot",
+    "extent": 1.5,
+    "size": 50
+  },
+  "encoding": {
+    "x": {
+      "field": "rate_category",
+      "type": "nominal",
+      "title": "Rate Category",
+      "axis": {
+        "labelAngle": -45,
+        "labelFontSize": 11
+      }
+    },
+    "y": {
+      "field": "revenue_score",
+      "type": "quantitative",
+      "title": "Revenue Score",
+      "scale": {
+        "zero": false
+      },
+      "axis": {
+        "labelFontSize": 11,
+        "grid": true
+      }
+    },
+    "color": {
+      "field": "rate_category",
+      "type": "nominal",
+      "scale": {
+        "range": ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#56B4E9", "#CC79A7", "#F0E442"]
+      },
+      "legend": null
+    },
+    "tooltip": [
+      {"field": "rate_category", "type": "nominal", "title": "Rate Category"}
+    ]
+  },
+  "config": {
+    "view": { "stroke": null },
+    "font": "Inter, sans-serif",
+    "axis": { 
+      "labelColor": "#475569", 
+      "titleColor": "#0f172a", 
+      "gridColor": "#e2e8f0", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600,
+      "domainColor": "#cbd5e0"
+    },
+    "legend": { 
+      "labelColor": "#0f172a", 
+      "titleColor": "#0f172a", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600
+    }
+  }
+}

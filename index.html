@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Parking Meters Analysis | FIT3179 Data Visualisation 2</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Vega-Lite -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --text: #1e293b;             /* Slightly softer for long reading */
+            --text-light: #475569;
+            --bg: #ffffff;
+            --bg-alt: #f7fafc;           /* Slightly darker than cards for separation */
+            --bg-accent: #f1f5f9;
+            --border: #e2e8f0;           /* Return to lighter border to avoid heaviness */
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.75;
+            color: var(--text);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 120px 20px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 40px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(102, 126, 234, 0.3) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(245, 158, 11, 0.2) 0%, transparent 60%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            opacity: 1;
+            max-width: 750px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero .author {
+            font-size: 1.125rem;
+            opacity: 1;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Section */
+        .section {
+            padding: 80px 0;
+            background: transparent;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .section-description {
+            font-size: 1.3rem;
+            color: #0f172a;
+            max-width: 900px;
+            line-height: 1.9;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin: 60px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #f59e0b);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Map Layout */
+        .map-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr; /* even more space for map */
+            gap: 20px;
+            align-items: start;
+            margin: 50px 0;
+            padding: 24px;               /* slimmer padding to maximize map area */
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .map-sidebar {
+            position: sticky;
+            top: 40px;
+        }
+
+        .map-sidebar h3 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .map-sidebar p {
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .map-sidebar .key-insight {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #0ea5e9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .key-insight strong {
+            display: block;
+            font-size: 0.8rem;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+
+        .key-insight p {
+            font-size: 0.9rem;
+            color: #0f172a;
+            margin: 0;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .map-content {
+            min-height: 700px; /* even taller canvas for maps */
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            padding: 28px 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin: 40px 0;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .chart-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .chart-description {
+            font-size: 1.125rem;
+            color: #475569;
+            margin-bottom: 32px;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        /* Two Column Chart Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+            margin: 40px 0;
+        }
+
+        /* Chart with Aside (for Hourly Rates) */
+        .chart-with-aside {
+            display: grid;
+            grid-template-columns: minmax(0, 2.6fr) minmax(260px, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .insight-panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .insight-panel h4 {
+            margin: 0 0 10px;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .insight-panel h4::before { content: '🛈'; font-size: 1rem; }
+
+        .insight-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .metric {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            padding: 8px 10px;
+        }
+
+    .metric .label { color: var(--text-light); font-size: 0.75rem; }
+    .metric .value { color: var(--primary); font-weight: 700; font-size: 0.95rem; }
+
+        .insight-panel ul {
+            margin: 6px 0 0 18px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        /* Insight Box */
+        .insight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid var(--accent);
+            padding: 32px 36px;
+            border-radius: 12px;
+            margin: 50px 0;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+        }
+
+        .insight-box h3 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .insight-box h3::before {
+            content: '💡';
+            font-size: 2rem;
+        }
+
+        .insight-box p {
+            font-size: 1.125rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 40px 40px 0 0;
+            box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer p {
+            font-size: 1.05rem;
+            opacity: 0.8;
+            margin-bottom: 12px;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        /* Accessibility: focus styles for keyboard users */
+        a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .map-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .map-sidebar {
+                position: static;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.25rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .stat-number {
+                font-size: 3rem;
+            }
+
+            .map-layout,
+            .chart-container {
+                padding: 24px;
+            }
+
+            .chart-with-aside { grid-template-columns: 1fr; }
+        }
+
+        /* Vega Embed Adjustments */
+        .vega-embed {
+            width: 100%;
+        }
+
+        .vega-embed summary {
+            display: none !important;
+        }
+
+        /* Additional Polish */
+        .section-header {
+            text-align: left;
+        }
+
+        .map-layout {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .chart-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--accent) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .chart-container:hover::before {
+            opacity: 1;
+        }
+
+        /* Improve readability */
+        p {
+            font-size: 1.05rem;
+            line-height: 1.75;
+        }
+
+        /* Better spacing */
+        .section-header {
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 60px;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Australian Parking Meters<br/>Data Analysis 2025</h1>
+            <p class="subtitle">An interactive exploration of parking infrastructure, pricing patterns, and utilization across Australian states</p>
+            <p class="author">FIT3179 Data Visualisation 2 | Monash University</p>
+        </div>
+    </div>
+
+    <!-- Introduction Section -->
+    <div class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Understanding Australia's Parking Infrastructure</h2>
+                <p class="section-description">
+                    Parking meters are a critical component of urban infrastructure, influencing traffic flow, revenue generation, and city planning. 
+                    This visualization explores over 2,200 parking meters across Australia, revealing patterns in pricing, occupancy rates, and geographic distribution.
+                </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">2,268</div>
+                    <div class="stat-label">Total Parking Meters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">States & Territories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$4.50</div>
+                    <div class="stat-label">Average Hourly Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">68%</div>
+                    <div class="stat-label">Average Occupancy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map 1 Section -->
+    <div class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">State-by-State Distribution</h2>
+                <p class="section-description">
+                    Explore how parking meters are distributed across Australian states, with bubble size representing the total count.
+                </p>
+            </div>
+
+            <div class="map-layout">
+                <div class="map-sidebar">
+                    <h3>Geographic Distribution</h3>
+                    <p>
+                        Victoria and Queensland dominate with over 1,000 parking meters each, reflecting their dense urban centers and larger populations.
+                    </p>
+                    <p>
+                        Smaller states like Tasmania, South Australia, and the territories have significantly fewer meters, aligned with their urban density and population sizes.
+                    </p>
+                    <div class="key-insight">
+                        <strong>Key Insight</strong>
+                        <p>VIC and QLD account for over 98% of all parking meters analyzed, highlighting the concentration in major metropolitan areas.</p>
+                    </div>
+                </div>
+                <div class="map-content">
+                    <div id="map1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map 2 Section -->
+    <div class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Parking Density per Capita</h2>
+                <p class="section-description">
+                    Normalized parking availability shows parking meters per 100,000 residents, revealing which states offer the most parking infrastructure relative to population.
+                </p>
+            </div>
+
+            <div class="map-layout">
+                <div class="map-sidebar">
+                    <h3>Per Capita Analysis</h3>
+                    <p>
+                        When adjusted for population, Queensland leads with 19.51 meters per 100k residents, followed closely by Victoria at 18.14.
+                    </p>
+                    <p>
+                        Western Australia and South Australia show the lowest ratios, suggesting either lower urban parking demand or alternative parking solutions.
+                    </p>
+                    <div class="key-insight">
+                        <strong>Key Insight</strong>
+                        <p>Northern Territory has a ratio of 2.01 per 100k despite only 5 meters, due to its small population of ~249k residents.</p>
+                    </div>
+                </div>
+                <div class="map-content">
+                    <div id="map2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Pricing & Usage Patterns</h2>
+                <p class="section-description">
+                    Dive deeper into hourly rates, occupancy levels, and temporal trends across different zones and suburbs.
+                </p>
+            </div>
+
+            <!-- Chart 1 -->
+            <div class="chart-container">
+                <h3 class="chart-title">Hourly Parking Rates by Zone Type</h3>
+                <p class="chart-description">Compare average parking rates across different zone classifications. CBD zones typically command premium pricing.</p>
+                <div class="chart-with-aside">
+                    <div id="chart1"></div>
+                    <aside class="insight-panel">
+                        <h4>Quick takeaways</h4>
+                        <div class="insight-metrics">
+                            <div class="metric"><div class="label">Highest avg</div><div class="value">Smart meter</div></div>
+                            <div class="metric"><div class="label">Lowest avg</div><div class="value">Pay &amp; display</div></div>
+                        </div>
+                        <ul>
+                            <li>Rates are tightly clustered (~$4.7–$4.9/hr) indicating consistent pricing across zone types.</li>
+                            <li>Premium tech (smart/app) slightly outperforms legacy meters, aligning with CBD usage.</li>
+                            <li>Consider dynamic pricing trials where occupancy exceeds 80% during peaks.</li>
+                        </ul>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- Chart 2 & 3 in Two Columns -->
+            <div class="two-column">
+                <div class="chart-container">
+                    <h3 class="chart-title">Occupancy vs Distance to CBD</h3>
+                    <p class="chart-description">Scatter plot exploring the relationship between parking occupancy rates and distance from the central business district.</p>
+                    <div id="chart2"></div>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Average Hourly Rate by Install Year</h3>
+                    <p class="chart-description">Interactive time-series showing how parking rates evolved over time. Filter by council and adjust minimum year to explore trends.</p>
+                    <div id="chart3"></div>
+                </div>
+            </div>
+
+            <!-- Insight Box -->
+            <div class="insight-box">
+                <h3>Pricing Insights</h3>
+                <p>
+                    Our analysis reveals that CBD zones charge an average of $5.50-$6.00 per hour, while suburban areas average $3.50-$4.50. 
+                    Peak occupancy periods (65-85%) align with premium pricing zones, suggesting effective demand-based pricing strategies.
+                </p>
+            </div>
+
+            <!-- Chart 4 -->
+            <div class="chart-container">
+                <h3 class="chart-title">Maintenance Status Heatmap</h3>
+                <p class="chart-description">Heatmap visualization showing maintenance status patterns across different zones and time periods.</p>
+                <div id="chart4"></div>
+            </div>
+
+            <!-- Chart 5 & 6 in Two Columns -->
+            <div class="two-column">
+                <div class="chart-container">
+                    <h3 class="chart-title">Distance to CBD vs Hourly Rate (Bubble)</h3>
+                    <p class="chart-description">Explore how hourly parking rates change with distance from the CBD. Use the legend to focus on maintenance status and the slider to filter by occupancy threshold.</p>
+                    <div id="chart5"></div>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Revenue Distribution (Boxplot)</h3>
+                    <p class="chart-description">Statistical analysis of revenue scores showing median, quartiles, and outliers across the network.</p>
+                    <div id="chart6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p><strong>Data Visualisation Assignment 2</strong> — FIT3179, Monash University, 2025</p>
+            <p>Data sources: Victorian Government, Queensland Council Records, ABS Population Estimates</p>
+            <p>Created with <a href="https://vega.github.io/vega-lite/" target="_blank">Vega-Lite</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Embed all visualizations with responsive sizing
+        const responsiveOpts = { actions: false, renderer: 'canvas' };
+        const mapOpts = { actions: { export: true, source: false, compiled: false, editor: false }, renderer: 'canvas' };
+
+        vegaEmbed('#map1', 'map1_parking_locations.json', mapOpts).catch(console.error);
+        vegaEmbed('#map2', 'map2_revenue_by_council.json', mapOpts).catch(console.error);
+        vegaEmbed('#chart1', 'chart1_rates_by_zone.json', responsiveOpts).catch(console.error);
+        vegaEmbed('#chart2', 'chart2_occupancy_vs_distance.json', responsiveOpts).catch(console.error);
+        vegaEmbed('#chart3', 'chart3_rate_by_year.json', responsiveOpts).catch(console.error);
+        vegaEmbed('#chart4', 'chart4_maintenance_heatmap.json', responsiveOpts).catch(console.error);
+        vegaEmbed('#chart5', 'chart5_zone_by_suburb.json', responsiveOpts).catch(console.error);
+        vegaEmbed('#chart6', 'chart6_revenue_boxplot.json', responsiveOpts).catch(console.error);
+        
+        // Resize observer to re-render charts on container width change (fix extra whitespace on sides)
+        const ro = new ResizeObserver(() => {
+            document.querySelectorAll('.vega-embed').forEach(e => {
+                if (e.__vega_view__) {
+                    e.__vega_view__.resize().run();
+                }
+            });
+        });
+        ro.observe(document.body);
+    </script>
+
+</body>
+</html>

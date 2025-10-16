@@ -1,0 +1,9 @@
+state,state_full,centroid_lon,centroid_lat,meter_count,avg_occupancy,avg_rate,population,rate_per_100k
+VIC,Victoria,144.4,-36.8,1200,72.3,4.80,6613700,38.14
+NSW,New South Wales,147.0,-33.2,30,75.5,5.25,8293965,13.36
+QLD,Queensland,146.0,-21.5,1038,68.9,4.20,5322000,25.51
+SA,South Australia,137.0,-30.8,5,71.2,4.50,1820500,5.27
+WA,Western Australia,122.5,-26.0,5,69.8,4.80,2785500,0.18
+TAS,Tasmania,146.8,-42.2,5,66.4,3.90,571500,0.87
+NT,Northern Territory,134.0,-19.8,5,70.6,4.20,249200,9.01
+ACT,Australian Capital Territory,149.2,-35.5,5,73.8,4.50,461000,5.08

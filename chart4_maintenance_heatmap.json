@@ -1,0 +1,88 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 420,
+  "autosize": { "type": "fit", "contains": "padding" },
+  
+  "data": {
+    "url": "parking_meters_enriched.csv"
+  },
+  "transform": [
+    {
+      "aggregate": [
+        {
+          "op": "count",
+          "as": "meter_count"
+        }
+      ],
+      "groupby": ["installed_year", "maintenance_status"]
+    },
+    {
+      "filter": "datum.installed_year >= 2010 && datum.installed_year <= 2024"
+    }
+  ],
+  "mark": {
+    "type": "rect",
+    "stroke": "#fff",
+    "strokeWidth": 2
+  },
+  "encoding": {
+    "x": {
+      "field": "installed_year",
+      "type": "ordinal",
+      "title": "Installation Year",
+      "axis": {
+        "labelAngle": -45,
+        "labelFontSize": 10
+      }
+    },
+    "y": {
+      "field": "maintenance_status",
+      "type": "nominal",
+      "title": "Maintenance Status",
+      "axis": {
+        "labelFontSize": 11
+      }
+    },
+    "color": {
+      "field": "meter_count",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "oranges"
+      },
+      "legend": {
+        "title": "Number of Meters",
+        "titleFontSize": 12,
+        "labelFontSize": 11,
+        "orient": "right"
+      }
+    },
+    "tooltip": [
+      {"field": "installed_year", "type": "ordinal", "title": "Year Installed"},
+      {"field": "maintenance_status", "type": "nominal", "title": "Status"},
+      {"field": "meter_count", "type": "quantitative", "title": "Number of Meters"}
+    ]
+  },
+  "config": {
+    "view": { "stroke": null },
+    "font": "Inter, sans-serif",
+    "axis": { 
+      "labelColor": "#475569", 
+      "titleColor": "#0f172a", 
+      "gridColor": "#e2e8f0", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600,
+      "domainColor": "#cbd5e0"
+    },
+    "legend": { 
+      "labelColor": "#0f172a", 
+      "titleColor": "#0f172a", 
+      "labelFontSize": 13, 
+      "titleFontSize": 14,
+      "titleFontWeight": 700,
+      "labelFontWeight": 600
+    }
+  }
+}
