@@ -33,7 +33,7 @@
           "legend": { "orient": "bottom", "direction": "horizontal", "titleFontSize": 13, "labelFontSize": 11 }
         },
         "color": { "field": "maintenance_status", "type": "nominal", "title": "Maintenance Status",
-          "scale": { "range": ["#0072B2", "#E69F00", "#D55E00"] },
+          "scale": { "domain": ["OK", "Overdue"], "range": ["#0072B2", "#E69F00"] },
           "legend": { "orient": "bottom", "titleFontSize": 13, "labelFontSize": 12, "symbolSize": 140 }
         },
         "opacity": { "condition": { "param": "maintSel", "value": 0.75 }, "value": 0.1 },

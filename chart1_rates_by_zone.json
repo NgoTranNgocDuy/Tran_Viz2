@@ -29,15 +29,20 @@
   "layer": [
     {
       "mark": {
-        "type": "bar",
-        "cornerRadiusEnd": 4
+        "type": "line",
+        "point": {
+          "filled": true,
+          "size": 120
+        },
+        "strokeWidth": 3,
+        "color": "#0ea5e9"
       },
       "encoding": {
         "x": {
           "field": "zone_type",
           "type": "nominal",
           "title": "Zone Type",
-          "sort": "-y",
+          "sort": {"field": "avg_rate", "order": "descending"},
           "axis": {
             "labelAngle": -45,
             "labelFontSize": 11
@@ -47,18 +52,14 @@
           "field": "avg_rate",
           "type": "quantitative",
           "title": "Average Rate per Hour ($)",
+          "scale": {
+            "domain": [4.4, 5.0]
+          },
           "axis": {
             "labelFontSize": 11
           }
         },
-        "color": {
-          "field": "zone_type",
-          "type": "nominal",
-          "scale": {
-            "scheme": "category10"
-          },
-          "legend": null
-        },
+        "color": {"value": "#0ea5e9"},
         "tooltip": [
           {"field": "zone_type", "type": "nominal", "title": "Zone Type"},
           {"field": "avg_rate", "type": "quantitative", "title": "Avg Rate ($)", "format": ".2f"},

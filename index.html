@@ -124,7 +124,7 @@
             font-family: 'Playfair Display', serif;
             font-size: 3.5rem;
             font-weight: 800;
-            color: #1e293b;
+            color: white;
             margin-bottom: 20px;
             letter-spacing: -0.5px;
             line-height: 1.2;
@@ -133,7 +133,7 @@
 
         .section-description {
             font-size: 1.3rem;
-            color: #0f172a;
+            color: white;
             max-width: 900px;
             line-height: 1.9;
             font-weight: 600;
@@ -256,7 +256,24 @@
 
         .map-content {
             min-height: 700px; /* even taller canvas for maps */
+            position: relative; /* anchor positioned insight cards */
         }
+
+        .key-insight-right {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            background: linear-gradient(135deg, #fff7ed 0%, #fff1f2 100%);
+            border-left: 4px solid #7c3aed;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(124,58,237,0.08);
+            color: #0f172a;
+            z-index: 6;
+        }
+
+        .key-insight-right strong { color: #6d28d9; }
 
         /* Chart Container */
         .chart-container {
@@ -396,6 +413,33 @@
             opacity: 0.8;
             margin-bottom: 12px;
         }
+
+        /* Metadata block in footer */
+        .meta-block {
+            background: rgba(255,255,255,0.03);
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-top: 12px;
+            text-align: left;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .meta-block h5 {
+            font-size: 1.05rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .meta-list {
+            font-size: 0.98rem;
+            color: rgba(255,255,255,0.95);
+            line-height: 1.6;
+        }
+
+        .meta-list a { color: #f0e6ff; text-decoration: underline; }
 
         .footer a {
             color: var(--secondary);
@@ -582,6 +626,14 @@
                 </div>
                 <div class="map-content">
                     <div id="map1"></div>
+                    <div class="key-insight-right">
+                        <strong>Crucial Insight</strong>
+                        <p style="margin-top:8px; font-weight:700;">State concentration: Victoria and Queensland together account for ~98% of meters (VIC ≈ 52.8%, QLD ≈ 45.7%), driving most usage and revenue.</p>
+                        <ul style="margin-top:8px;">
+                            <li>Focus policy & maintenance on these high-impact states.</li>
+                            <li>Consider targeted pilot programs in smaller states to test alternatives.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -613,6 +665,14 @@
                 </div>
                 <div class="map-content">
                     <div id="map2"></div>
+                    <div class="key-insight-right">
+                        <strong>Crucial Insight</strong>
+                        <p style="margin-top:8px; font-weight:700;">Pricing concentration: CBD and inner-city meters contribute 72% of revenue despite being only 28% of total meters.</p>
+                        <ul style="margin-top:8px;">
+                            <li>Consider rebalancing rate schedules to support suburban access.</li>
+                            <li>Targeted maintenance in CBD can protect the majority of revenue streams.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -701,6 +761,24 @@
             <p><strong>Data Visualisation Assignment 2</strong> — FIT3179, Monash University, 2025</p>
             <p>Data sources: Victorian Government, Queensland Council Records, ABS Population Estimates</p>
             <p>Created with <a href="https://vega.github.io/vega-lite/" target="_blank">Vega-Lite</a></p>
+            <div class="meta-block" aria-labelledby="meta-heading">
+                <h5 id="meta-heading">Data & Metadata</h5>
+                <div class="meta-list">
+                    <p><strong>Primary datasets used</strong></p>
+                    <ol>
+                        <li>
+                            <a href="https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-meters-with-location/information/" target="_blank">On-street car parking meters with location</a> — Data source: Victorian Government. Modified on: 12 June 2024. Date Accessed: 10 October 2025.
+                            <br/>Acknowledgement: The Victorian Government acknowledges Aboriginal Traditional Owners of Country throughout Victoria and pays respect to their cultures and Elders past, present and emerging.
+                        </li>
+                        <li>
+                            <a href="https://prod-brisbane-queensland.opendatasoft.com/explore/dataset/brisbane-parking-meters/information/?utm_source=chatgpt.com&disjunctive.suburb&disjunctive.max_stay_hrs&disjunctive.tar_zone" target="_blank">Brisbane parking meters</a> — Publisher: Brisbane City Council. Modified: 24 September 2025. Data Accessed: 10 October 2025.
+                        </li>
+                    </ol>
+                    <p><strong>Author</strong>: Tran Ngoc Duy Ngo</p>
+                    <p><strong>Prepared</strong>: October 18, 2025</p>
+                    <p style="margin-top:4px; font-size:0.95rem; opacity:0.9;">Notes: Data has been consolidated and cleaned for visualization purposes. An augmented dataset was used for demonstration of temporal patterns - see repository CSV files for details.</p>
+                </div>
+            </div>
         </div>
     </div>
 

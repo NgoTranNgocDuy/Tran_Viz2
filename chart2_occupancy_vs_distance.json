@@ -3,104 +3,141 @@
   "width": "container",
   "height": 420,
   "autosize": { "type": "fit", "contains": "padding" },
-  
-  "data": {
-    "url": "parking_meters_enriched.csv"
-  },
+
+  "params": [
+    {
+      "name": "zoneFilter",
+      "value": "App-Only",
+      "bind": {
+        "input": "select",
+        "options": ["All", "App-Only", "Pay-and-Display", "Smart Meter", "Ticketed"],
+        "labels": ["All Zone Types", "App-Only", "Pay-and-Display", "Smart Meter", "Ticketed"],
+        "name": "Select Zone Type: "
+      }
+    }
+  ],
+
+  "data": { "url": "parking_meters_enriched.csv" },
+
+  "transform": [
+    { "filter": "zoneFilter === 'All' || datum.zone_type === zoneFilter" }
+  ],
+
   "layer": [
     {
-      "mark": {
-        "type": "point",
-        "filled": true,
-        "opacity": 0.6,
-        "size": 60
-      },
+      "mark": { "type": "point", "filled": true, "opacity": 0.6, "size": 60 },
       "encoding": {
         "x": {
           "field": "distance_to_cbd_km",
           "type": "quantitative",
           "title": "Distance to CBD (km)",
-          "scale": {
-            "domain": [0, 10]
-          },
-          "axis": {
-            "labelFontSize": 11,
-            "grid": true
-          }
+          "scale": { "domain": [0, 10] },
+          "axis": { "labelFontSize": 11 }
         },
         "y": {
           "field": "occupancy_pct",
           "type": "quantitative",
           "title": "Occupancy Rate (%)",
-          "axis": {
-            "labelFontSize": 11,
-            "grid": true
-          }
+          "axis": { "labelFontSize": 11 }
         },
         "color": {
           "field": "zone_type",
           "type": "nominal",
-          "scale": {
-            "scheme": "tableau10"
-          },
-          "legend": {
-            "title": "Zone Type",
-            "titleFontSize": 12,
-            "labelFontSize": 11,
-            "orient": "right"
-          }
+          "scale": { "domain": ["App-Only","Pay-and-Display","Smart Meter","Ticketed"], "range": ["#4E79A7","#F28E2B","#E15759","#76B7B2"] },
+          "legend": { "title": "Zone Type", "orient": "right" }
         },
         "tooltip": [
-          {"field": "meter_id", "type": "nominal", "title": "Meter ID"},
-          {"field": "suburb", "type": "nominal", "title": "Suburb"},
-          {"field": "distance_to_cbd_km", "type": "quantitative", "title": "Distance to CBD (km)", "format": ".2f"},
-          {"field": "occupancy_pct", "type": "quantitative", "title": "Occupancy %", "format": ".1f"},
-          {"field": "zone_type", "type": "nominal", "title": "Zone Type"}
+          { "field": "meter_id", "title": "Meter ID" },
+          { "field": "suburb", "title": "Suburb" },
+          { "field": "distance_to_cbd_km", "title": "Distance to CBD (km)", "format": ".2f" },
+          { "field": "occupancy_pct", "title": "Occupancy %", "format": ".1f" },
+          { "field": "zone_type", "title": "Zone Type" }
         ]
       }
     },
+
     {
-      "mark": {
-        "type": "line",
-        "color": "#d62728",
-        "strokeWidth": 3
-      },
+      "mark": { "type": "line", "color": "#d62728", "strokeWidth": 3 },
       "transform": [
-        {
-          "regression": "occupancy_pct",
-          "on": "distance_to_cbd_km",
-          "method": "linear"
-        }
+        { "regression": "occupancy_pct", "on": "distance_to_cbd_km", "method": "linear", "extent": [0, 10] }
       ],
       "encoding": {
-        "x": {
-          "field": "distance_to_cbd_km",
-          "type": "quantitative"
-        },
-        "y": {
-          "field": "occupancy_pct",
-          "type": "quantitative"
-        }
+        "x": { "field": "distance_to_cbd_km", "type": "quantitative", "scale": { "domain": [0, 10] } },
+        "y": { "field": "occupancy_pct", "type": "quantitative" }
       }
+    },
+
+    {
+      "data": {
+        "values": [
+          {
+            "x": 8.5,
+            "y": 36,
+            "title": "Negative correlation:",
+            "line1": "Occupancy decreases as",
+            "line2": "distance from CBD increases"
+          }
+        ]
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "point",
+            "shape": "circle",
+            "size": 1,
+            "fill": "#fff5f5",
+            "stroke": "#c53030",
+            "strokeWidth": 1,
+            "opacity": 0.35
+          },
+          "encoding": {
+            "x": { "field": "x", "type": "quantitative" },
+            "y": { "field": "y", "type": "quantitative" }
+          }
+        },
+        {
+          "data": { "values": [ { "x": 7.2, "y": 62 }, { "x": 8.5, "y": 66 } ] },
+          "mark": { "type": "line", "stroke": "#c53030", "strokeWidth": 1.6, "strokeDash": [6,4], "opacity": 0.85 },
+          "encoding": { "x": { "field": "x", "type": "quantitative" }, "y": { "field": "y", "type": "quantitative" } }
+        },
+        {
+          "mark": { "type": "point", "shape": "circle", "size": 140, "fill": "#c53030", "stroke": "#ffffff", "strokeWidth": 1.6, "opacity": 0.95 },
+          "encoding": { "x": { "field": "x", "type": "quantitative" }, "y": { "field": "y", "type": "quantitative" } },
+          "data": { "values": [ { "x": 8.5, "y": 66 } ] }
+        },
+        {
+          "mark": { "type": "text", "align": "left", "dx": 26, "dy": -66, "fontSize": 16, "fontWeight": "bold", "fill": "#6b1313" },
+          "encoding": { "x": { "field": "x", "type": "quantitative" }, "y": { "field": "y", "type": "quantitative" }, "text": { "field": "title" } }
+        },
+        {
+          "mark": { "type": "text", "align": "left", "dx": 26, "dy": -46, "fontSize": 13, "fontWeight": 600, "fill": "#7a1a1a" },
+          "encoding": { "x": { "field": "x", "type": "quantitative" }, "y": { "field": "y", "type": "quantitative" }, "text": { "field": "line1" } }
+        },
+        {
+          "mark": { "type": "text", "align": "left", "dx": 26, "dy": -30, "fontSize": 13, "fontWeight": 600, "fill": "#7a1a1a" },
+          "encoding": { "x": { "field": "x", "type": "quantitative" }, "y": { "field": "y", "type": "quantitative" }, "text": { "field": "line2" } }
+        }
+      ]
     }
   ],
+
   "config": {
     "view": { "stroke": null },
     "font": "Inter, sans-serif",
-    "axis": { 
-      "labelColor": "#475569", 
-      "titleColor": "#0f172a", 
-      "gridColor": "#e2e8f0", 
-      "labelFontSize": 13, 
+    "axis": {
+      "labelColor": "#475569",
+      "titleColor": "#0f172a",
+      "gridColor": "#e2e8f0",
+      "labelFontSize": 13,
       "titleFontSize": 14,
       "titleFontWeight": 700,
       "labelFontWeight": 600,
       "domainColor": "#cbd5e0"
     },
-    "legend": { 
-      "labelColor": "#0f172a", 
-      "titleColor": "#0f172a", 
-      "labelFontSize": 13, 
+    "legend": {
+      "labelColor": "#0f172a",
+      "titleColor": "#0f172a",
+      "labelFontSize": 13,
       "titleFontSize": 14,
       "titleFontWeight": 700,
       "labelFontWeight": 600
